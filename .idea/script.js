@@ -22,6 +22,8 @@ const pbAgain = document.querySelector(".again")
 
 const bdy = document.querySelector("body")
 
+const gameOver = document.getElementById("gameOver")
+
 let randomNumb = 0;
 
 function randomNumber(){
@@ -31,47 +33,66 @@ function randomNumber(){
 }
 
 function reset(){
-    lblNumber.textContent = "";
+    currentScore = 20;
+    lblScore.textContent = currentScore;
+    lblNumber.textContent = "?";
     bdy.style.backgroundColor = "black";
 }
 
-pbAgain.addEventListener("click", randomNumber)
-pbAgain.addEventListener("click", reset)
+pbAgain.addEventListener("click", () => {
+    randomNumber();
+    reset();
+});
 
 let currentScore = Number(lblScore.textContent);
 let currentHighscore = Number(highScore.textContent)
 
 function calculateHighScore(){
-    if(currentScore > currentHighscore) {
-        highScore.textContent = currentScore + 10;
+    if (currentScore > currentHighscore) {
+        currentHighscore = currentScore;
+        highScore.textContent = currentHighscore;
     }
 }
 
 function guessNumber(){
     const guess = Number(inpGuess.value);
+
+    if(isNaN(guess) || guess === 0){
+        lblMessage.textContent = "Du skal indtaste et gyldigt tal"
+        return;
+    }
+
+
     if(guess === randomNumb) {
         lblMessage.textContent = "Godt gættet!"
         lblNumber.textContent = randomNumb
             calculateHighScore()
-             currentScore += 10;
+             // currentScore += 10;
                 lblScore.textContent = currentScore;
                     bdy.style.backgroundColor = "green";
-                    if(currentScore >= 50){
+                    const winSound = document.getElementById("correctSound");
+                    winSound.play();
+                    /*if(currentScore >= 50){
                         lblMessage.textContent = "DU HAR NÅET MAX!";
                         const overskrift = document.querySelector("h1")
                         overskrift.textContent = "DU HAR VUNDET"
-                     }
+                     }*/
     }else if(guess < randomNumb){
         lblMessage.textContent = "Det er for lavt!"
             currentScore--;
                 lblScore.textContent = currentScore;
-    }else if(guess > randomNumb){
+                gameOver.play();
+
+    }else if(guess > randomNumb) {
         lblMessage.textContent = "Det er for højt"
             currentScore--;
                 lblScore.textContent = currentScore;
+                gameOver.play();
     }else{
         lblMessage.textContent = "Prøv igen "
     }
 }
 
 pbGuess.addEventListener("click", guessNumber)
+randomNumber();
+reset();
